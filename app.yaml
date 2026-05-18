@@ -1,0 +1,10 @@
+runtime: python312
+entrypoint: gunicorn -b :$PORT main:app --timeout 300
+
+runtime_config:
+  python_version: 3
+
+env_variables:
+    GCLOUD_PROJECT: robust-optimizer
+    CLOUD_STORAGE_BUCKET: arquivos_usuarios
+    ADMIN_EMAIL: heveras-geral@yahoo.com.br

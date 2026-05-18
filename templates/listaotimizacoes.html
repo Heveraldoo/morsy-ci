@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% include 'cabecalho.html' %}
+    <title>Robust Optimizer</title>
+</head>
+
+<body id="page-top">
+    <header class="masthead">
+        <!-- Page Wrapper -->
+    <div id="wrapper">
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+                <!-- Topbar -->
+                {% include 'navibar.html' %}
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+
+                    <!-- Page Heading -->
+                    <h1 class="h3 mb-2 text-gray-800">Quality-based Method for Building Composite Indicators</h1>
+                    <p class="mb-4">Click in an action to process</p>
+
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                      {% if messages %}
+                        {% for category, message in messages %}
+                          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                          </div>
+                        {% endfor %}
+                      {% endif %}
+                    {% endwith %}
+
+                    <!-- DataTales Example -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <a href="novaotimizacao.html"><h6 class="m-0 font-weight-bold text-primary">Add a new optimization</h6></a>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>Time</th>
+                                            <th>File</th>
+                                            <th>User</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <!--
+                                    <tfoot>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Position</th>
+                                            <th>Office</th>
+                                            <th>Age</th>
+                                            <th>Start date</th>
+                                            <th>Salary</th>
+                                        </tr>
+                                    </tfoot>-->
+                                    <tbody>
+                                        {% for a in Dados %}
+                                        <tr data-iddado="{{ a['IdDado'] }}" data-status="{{ a['Status'] }}">
+                                            <td>{{ a['Data'] }}</td>
+                                            <td>{{ a['Arquivo'] }}</td>
+                                            <td>{{ a['Usuario'] }}</td>
+                                            <td class="status-cell">{{ a['Status'] }}</td>
+                                            <td class="process-action-cell">
+                                                {% if a['Status'] != 'Processado' %}
+                                                <form action="{{ url_for('processardadosfirestore') }}" method="POST">
+                                                    <input type="hidden" name="textIdDado" value="{{ a['IdDado'] }}">
+                                                    <button type="submit" class="btn btn-primary btn-user btn-block">
+                                                        to process
+                                                    </button>
+                                                </form>
+                                                {% endif %}
+                                            </td>
+                                            <td class="results-action-cell">                                         
+                                                {% if a['Status'] == 'Processado' %}       
+                                                <form action="/viewgraficos.html" method="POST">
+                                                    <input type="hidden" name="textIdDado" value="{{ a['IdDado'] }}">
+                                                    <button type="submit" class="btn btn-primary btn-user btn-block">
+                                                        results
+                                                    </button>
+                                                </form>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- /.container-fluid -->
+
+            </div>
+            <!-- End of Main Content -->
+
+            <!-- Footer -->
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>Copyright &copy; Your Website 2025</span>
+                    </div>
+                </div>
+            </footer>
+            <!-- End of Footer -->
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+    </header>
+
+    {% include 'rodape.html' %}
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const POLLING_INTERVAL_MS = 5000; // Verificar a cada 5 segundos
+        const rowsToMonitor = document.querySelectorAll('tr[data-status="Em Processamento"]');
+        const activePollers = {};
+
+        function createResultsButton(idDado) {
+            const form = document.createElement('form');
+            form.action = '/viewgraficos.html';
+            form.method = 'POST';
+
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'textIdDado';
+            input.value = idDado;
+
+            const button = document.createElement('button');
+            button.type = 'submit';
+            button.className = 'btn btn-primary btn-user btn-block';
+            button.textContent = 'results';
+
+            form.appendChild(input);
+            form.appendChild(button);
+            return form;
+        }
+
+        function checkStatus(row) {
+            const idDado = row.dataset.iddado;
+            
+            fetch(`/get_optimization_status/${idDado}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status && data.status !== 'Em Processamento') {
+                        // Atualiza o texto do status na célula
+                        const statusCell = row.querySelector('.status-cell');
+                        statusCell.textContent = data.status;
+                        row.dataset.status = data.status;
+
+                        // Se o processamento foi concluído com sucesso
+                        if (data.status === 'Processado') {
+                            // Remove o botão "to process"
+                            row.querySelector('.process-action-cell').innerHTML = '';
+                            // Adiciona o botão "results"
+                            row.querySelector('.results-action-cell').appendChild(createResultsButton(idDado));
+                        }
+                        
+                        // Para de verificar este item
+                        clearInterval(activePollers[idDado]);
+                        delete activePollers[idDado];
+                    }
+                }).catch(error => console.error('Error polling status:', error));
+        }
+
+        rowsToMonitor.forEach(row => {
+            const idDado = row.dataset.iddado;
+            activePollers[idDado] = setInterval(() => checkStatus(row), POLLING_INTERVAL_MS);
+        });
+    });
+    </script>
+</body>
+
+</html>

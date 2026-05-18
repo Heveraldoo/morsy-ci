@@ -1,0 +1,135 @@
+    <!-- Logo -->
+    <div class="row justify-content-md-center">
+        <div class="col col-lg-2">
+        </div>
+        <div class="col-md-auto">
+          <div class="card">
+            <img src="../static/assets/img/MORSy-CI.png" alt="..." title="Multi-objective Robust System for Building Composite Indicators" />          </div>
+        </div>
+        <div class="col col-lg-2">
+        </div>
+    </div>
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" href="login.html">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="static/vendor/jquery/jquery.min.js"></script>
+    <script src="static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="static/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="static/js/sb-admin-2.min.js"></script>
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+        
+        {% if not session.email %}
+        <script>
+            window.onload = function () {
+                google.accounts.id.initialize({
+                    client_id: '1033542820153-22rb3s96ng33vekqqa6sa7nbfchqqvbr.apps.googleusercontent.com',
+                    callback: handleOnetapResponse,
+                    login_uri: "https://robust-optimizer-1033542820153.southamerica-east1.run.app/",
+                    your_own_param_1_to_login: "123",
+                    your_own_param_2_to_login: "456"
+                });
+                //document.getElementById("texto2").value = "ajax";
+                google.accounts.id.prompt((notification) => {
+                    if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+                        //window.location.href = "/teste";
+                        //document.getElementById("texto").value = notification.getNotDisplayedReason();
+                        // continue with another identity provider.
+    
+                        $.ajax({
+                            url: '/teste',
+                            type: 'POST',
+                            data: '{ "doc" : "tudo aqui" }',
+                            dataType: 'json',
+                            contentType: "application/json; charset=utf-8", //questo ok 
+                            success: function (data, textStatus) {
+                                window.location.href = '/';
+                            }
+    
+                        });
+    
+                        //document.getElementById("texto").value = "Voltei";
+    
+    
+                    }
+                });
+    
+            }
+            handleOnetapResponse = (response) => {
+    
+                /* Pass response.credential to your server for verification */
+                /* Also raise any events that you wish here */
+                //document.getElementById("texto").value = "response.credential";
+                //window.location.href = "/teste";
+    
+                $.ajax({
+                    url: '/auth/info/googlejwt',
+                    method: 'GET',
+                    headers: {
+                        'X-Endpoint-API-UserInfo': response.credential,
+                        'Content-Type': 'application/json'
+                    },
+                    dataType: 'json',
+                    contentType: "application/json; charset=utf-8", //questo ok 
+                    success: function (data, textStatus) {
+                        window.location.href = '/';
+                        //document.getElementById("texto").value = data;
+                    }
+                });
+    
+                //document.getElementById("texto").value = "Autenticado";
+    
+    
+            }
+        </script>
+        {% endif %}
+        <script>
+            //var interval = setInterval(update_progress, 1000);
+            function update_progress() {
+                n = 50;
+                $('.progress-bar').animate({'width': n +'%'}).attr('aria-valuenow', n);    
+                /*
+                $.get('/progress').done(function(n){
+                    n = n / 1;  // percent value do total
+                    $('.progress-bar').animate({'width': n +'%'}).attr('aria-valuenow', n);    
+                    if (n == 100) {
+                        clearInterval(interval);
+                        callback(); // user defined
+                    }
+                }).fail(function() {
+                    clearInterval(interval);
+                    displayerror(); // user defined
+                });
+                */
+            }            
+        </script>
+

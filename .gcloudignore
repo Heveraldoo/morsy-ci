@@ -1,0 +1,32 @@
+.git
+.gitignore
+
+# Python artifacts and build directories
+__pycache__/
+build/
+dist/
+*.egg-info/
+
+# Ignored by the build system
+/setup.cfg
+
+# Test-related files
+testes/
+.pytest_cache/
+
+# IDE configuration
+.vscode/
+.idea/
+
+# Project-specific files not for deployment
+*.xlsx # Excel files are likely data, not code
+files/ # Generic directory for local files
+ropt_antes/ # Backup directory
+ropt_antes2/ # Backup directory
+ropt_antes3/ # Backup directory
+processadados.py # Local data processing script
+ropt.zip
+
+# Python virtual environment - should not be deployed
+.venv/
+.env

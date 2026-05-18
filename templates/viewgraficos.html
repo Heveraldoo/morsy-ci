@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% include 'cabecalho.html' %}
+    <title>Robust Optimizer</title>
+</head>
+
+<body id="page-top">
+    <header class="masthead">
+        <!-- Page Wrapper -->
+    <div id="wrapper">
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+                <!-- Topbar -->
+                {% include 'navibar.html' %}
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+
+                    <!-- Page Heading -->
+                    <h1 class="h2 mb-2 text-gray-800">Quality-based Method for Building Composite Indicators</h1>
+                    <h2 class="mb-4">See the Graphics</h2>
+
+                    <div class="row justify-content-md-center">
+                        <div class="col col-lg-2">
+                        </div>
+                        <div class="col-md-auto">
+                          <div class="card">
+                            {{ plotSemaforo1|safe }}
+                            <div class="card-body">
+                              <h5 class="card-title">Thermometer</h5>
+                              <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col col-lg-2">
+                        </div>
+                    </div>
+                    <p></p>
+                    <div class="row row-cols-1 row-cols-md-2 g-4">
+                        <div class="col">
+                          <div class="card">
+                            {{ plot|safe }}
+                            <div class="card-body">
+                              <h5 class="card-title">Histogram</h5>
+                              <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col">
+                          <div class="card">
+                            {{ plotdispersao|safe }}
+                            <div class="card-body">
+                              <h5 class="card-title">Regression</h5>
+                              <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col">
+                          <div class="card">
+                            {{ plotcorrecao|safe }}
+                            <div class="card-body">
+                              <h5 class="card-title">Outer loadings</h5>
+                              <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col">
+                          <div class="card">
+                            {{ plotincertezas|safe }}
+                            <div class="card-body">
+                              <h5 class="card-title">Ranking uncertainty</h5>
+                              <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                            </div>
+                          </div>
+                        </div>
+                    </div>
+                    <p></p>
+                    <h2 class="mb-4">See the Results</h2>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="container">
+                                <h3>Importance Coeficients</h3>
+                                <div>
+                                    <!-- class="table-responsive small" -->
+                                    <!-- class="table table-striped table-sm" -->
+                                    <table 
+                                        id="tableDataView"
+                                        data-toggle="table"
+                                        data-search="true"
+                                        data-show-columns="true"
+                                        data-show-pagination-switch="true"
+                                        data-pagination="true"
+                                        data-buttons-align="right">
+                                        <thead>
+                                            <tr>
+                                                {% for c in ColunasCoefs %}
+                                                    <th scope="col">{{ c }}</th>
+                                                {% endfor %}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                {% for v in Coef %}
+                                                    <td>{{ v }}</td>
+                                                {% endfor %}
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <h3>Composite Indicator Quality</h3>
+                                <div class="table-responsive small">
+                                    <!---->
+                                    <!-- -->
+                                    <table class="table table-striped table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Quality test</th>
+                                                <th scope="col">Worst</th>
+                                                <th scope="col">Found</th>
+                                                <th scope="col">Better</th>
+                                                <th scope="col">%</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for l in DadosQci %}
+                                            <tr>
+                                                <td>{{ Qci[loop.index-1] }}</td>
+                                                <td>{{ l[0] }}</td>
+                                                <td>{{ l[1] }}</td>
+                                                <td>{{ l[2] }}</td>
+                                                <td>{{ l[3] }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <h3>Comparison with most popular methods</h3>
+                                <div class="table-responsive small">
+                                    <!---->
+                                    <!-- -->
+                                    <table class="table table-striped table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Quality test</th>
+                                                {% for i in Iq %}
+                                                <th scope="col">{{ i }}</th>
+                                                {% endfor %}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for l in DadosIq %}
+                                            <tr>
+                                                <td>{{ Qci[loop.index-1] }}</td>
+                                                {% for i in l %}
+                                                <td>{{ i }}</td>
+                                                {% endfor %}
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <h3>Composite Indicators and Subindicators</h3>
+                                {% if Indicadores is defined %}
+                                <div class="table-responsive small">
+                                    <table 
+                                        class="table-responsive small"
+                                        class="table table-striped table-sm"
+                                        id="tableDataView"
+                                        data-toggle="table"
+                                        data-search="true"
+                                        data-show-columns="true"
+                                        data-height="460"
+                                        data-show-pagination-switch="true"
+                                        data-pagination="true"
+                                        data-buttons-align="right">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">#</th>
+                                                {% for c in Indicadores %}
+                                                <th scope="col">{{ c }}</th>
+                                                {% endfor %}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for d in DadosIndicadores %}
+                                            <tr>
+                                                <td>{{ loop.index }}</td>
+                                                {% for v in d %}
+                                                <td>{{ v }}</td>
+                                                {% endfor %}
+                                            </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                    </table>
+                                </div>
+                                {% endif %}
+                                <form action="/resultadosdownload" method="POST">
+                                    <input type="text" id="textIdDado" name="textIdDado"
+                                        value="{{ iddado }}" hidden>
+                                    <button type="submit" class="btn btn-primary btn-user btn-block">
+                                        Download Results
+                                    </button>
+                                </form>
+                            </div>
+                            <div class="col-lg-12">
+                                <!-- Brand Buttons -->
+                                <div class="card shadow mb-4">
+                                    <div class="card-header py-3">
+                                        <h6 class="m-0 font-weight-bold text-primary">What do these results mean?</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <h3>Importance Coefficients</h3>
+                                        <p>    Importance coefficients are the weights assigned to sub-indicators before aggregation. They slightly differentiate the influence of the sub-indicator on the composite indicator. The coefficients are reported before the construction of the composite indicator, and their real influence is only known later, based on the relationship between the sub-indicator and the composite indicator [1].</p>
+                                            
+                                        <h3>Composite Indicator Quality</h3>
+                                        <p>    These parameters signal the composite indicator's quality and reliability [2].</p>
+                                        <p>    Explanatory power: reflects the ability of the composite indicator to capture the concept of the multidimensional phenomenon from the perspective of conceptually significant variables of the composite indicator. For example, the correlation of income with a composite indicator of poverty should present a moderate or greater correlation to signal adequate informational power.</p>
+                                        <p>    Informational power: is associated with the transfer of information from the input data to the composite indicator. It measures the proportion of the original data captured by the composite indicator. Informational power, also known as informational loss, is useful for verifying the internal consistency of the composite indicator.</p>
+                                        <p>    Discriminating power: measures the informational diversity of the composite indicator. Entropy indices or dispersion statistics can measure it. Composite indicators with low informational power have similar scores, which makes it difficult to differentiate between decision-making units.</p>
+                                        <p>    Uncertainty: this is the most frequently used quality parameter. It measures the variation in ranking between the reference composite indicator and composite indicators constructed using other weights, normalization, and aggregation functions, signaling the stability of the internal structure of the composite indicator.</p>
+                                            
+                                        <h3>    Popular composite indicators</h3>
+                                        <p>    These methods differ essentially in how the sub-indicators are weighted [3].</p>
+                                        <p>    Benefit of Doubt (BoD): sub-indicators weighted to maximize scores. The BoD uses a weight matrix. The weights of the sub-indicators vary among themselves and the decision-making units. This weighting logic allows spatial heterogeneity to be operationalized when the decision-making units are geographic (city, neighborhoods, etc.) [4].</p>
+                                        <p>    Entropy: the entropy weighting method assumes that higher weights should be assigned to sub-indicators with greater informational diversity, contributing more to differentiating decision-making units [5].</p>
+                                        <p>    Principal Component Analysis: aims to construct a composite indicator that extracts the largest proportion of the information in the original data, maximizing the variance extracted. This logic causes higher weights to be assigned to the most intercorrelated sub-indicators [6].</p>
+                                        <p>    Equal Weights: assigns equal weights to all sub-indicators. This weighting logic prioritizes simplicity of execution and explanation of results. In addition, this weighting scheme proves useful when the multidimensional phenomenon does not have a well-established conceptual framework [7].</p>
+                                        <p>    A complete and detailed explanation of the subject can be found in the OECD guide for constructing composite indicators [8]</p>
+                                            
+                                        <h3>    References</h3>
+                                        <p>    [1] Becker, W., Paruolo, P., Saisana, M., & Saltelli, A. (2017). Weights and importance in composite indicators: mind the gap. Handbook of uncertainty quantification, 80, 1187-1216.</p>
+                                        <p>    [2] Ribeiro, L. C., Libório, M. P., Mannan, H., Laudares, S., Ekel, P. I., Vieira, D. A. G., & Nobre, C. N. (2024). Software for building and measuring the quality of composite indicators using ordered weighted averaging: So-called S-CI-OWA. SoftwareX, 26, 101660.</p>
+                                        <p>    [3] El Gibari, S., Gómez, T., & Ruiz, F. (2019). Building composite indicators using multicriteria methods: a review. Journal of Business Economics, 89(1), 1-24.</p>
+                                        <p>    [4] Cherchye, L., Moesen, W., Rogge, N., & Puyenbroeck, T. V. (2007). An introduction to 'benefit of the doubt'composite indicators. Social indicators research, 82, 111-145.</p>
+                                        <p>    [5] Libório, M. P., Karagiannis, R., Diniz, A. M. A., Ekel, P. I., Vieira, D. A. G., & Ribeiro, L. C. (2024). The use of information entropy and expert opinion in maximizing the discriminating power of composite indicators. Entropy, 26(2), 143.</p>
+                                        <p>    [6] Mazziotta, M., & Pareto, A. (2024). Principal component analysis for constructing socio-economic composite indicators: theoretical and empirical considerations. SN Social Sciences, 4(6), 114.</p>
+                                        <p>    [7] Greco, S., Ishizaka, A., Tasiou, M., & Torrisi, G. (2019). On the methodological framework of composite indices: A review of the issues of weighting, aggregation, and robustness. Social indicators research, 141, 61-94.</p>
+                                        <p>    [8] European Union, & Joint Research Centre. (2008). Handbook on constructing composite indicators: Methodology and user guide. OECD publishing.</p>
+                                            </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.container-fluid -->
+
+            </div>
+            <!-- End of Main Content -->
+
+            <!-- Footer -->
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>Copyright &copy; Your Website 2025</span>
+                    </div>
+                </div>
+            </footer>
+            <!-- End of Footer -->
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+    </header>
+
+    {% include 'rodape.html' %}
+</body>
+
+</html>

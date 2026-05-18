@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% include 'cabecalho.html' %}
+    <title>Robust Optimizer</title>
+</head>
+
+<body id="page-top">
+    <header class="masthead">
+        <!-- Page Wrapper -->
+    <div id="wrapper">
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+                <!-- Topbar -->
+                {% include 'navibar.html' %}
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+
+                    <!-- Page Heading -->
+                    <h1 class="h3 mb-2 text-gray-800">New Data Optimization</h1>
+                    <p class="mb-4">Create a new Optimization</p>
+
+                    <div class="row">
+
+                        <div class="col-lg-4">
+
+                            <!-- Circle Buttons -->
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Load the Data</h6>
+                                </div>
+                                <div class="card-body">
+                                    <form  action="/carregardados" method="POST" class="user" enctype="multipart/form-data">
+                                        <div class="input-group mb-3">
+                                            <input type="file" class="form-control" id="inputFile" name="inputFile" accept=".xlsx, .xls, .csv" onchange="submit()">
+                                            <!-- <label class="input-group-text" for="inputFile">Upload</label> -->
+                                        </div>
+                                        <div class="input-group mb-3">
+                                            {% if FileExtension == ".csv" %}
+                                            <label class="input-group-text" for="reference">Column Separator</label>
+                                            <select onchange="submit()" id="separador" name="separador" required>
+                                                {% if Separador == "," %}
+                                                <option selected value=",">,</option>
+                                                {% else %}
+                                                <option value=",">,</option>
+                                                {% endif %}
+                                                {% if Separador == ";" %}
+                                                <option selected value=";">;</option>
+                                                {% else %}
+                                                <option value=";">;</option>
+                                                {% endif %}
+                                            </select>
+                                            <label class="input-group-text" for="reference">Decimal Separator</label>
+                                            <select onchange="submit()" class="form-select" id="decimal" name="decimal" required>
+                                                {% if Decimal == "." %}
+                                                <option selected value=".">.</option>
+                                                {% else %}
+                                                <option value=".">.</option>
+                                                {% endif %}
+                                                {% if Decimal == "," %}
+                                                <option selected value=",">,</option>
+                                                {% else %}
+                                                <option value=",">,</option>
+                                                {% endif %}
+                                            </select>
+                                            {% endif %}
+                                        </div>        
+                                    </form>
+                                    <form name="formParametros" action="/criarotimizacao" method="POST" enctype="multipart/form-data">
+                                        <div class="input-group mb-3">
+                                            <button class="btn btn-outline-secondary w-100 dropdown-toggle" data-bs-auto-close="outside" type="button" data-bs-toggle="dropdown" aria-expanded="false">To Select Columns</button>
+                                            <ul class="dropdown-menu w-100">
+                                                {% for c in TodasColunas %}
+                                                <li>
+                                                    {% if c not in SelecionaveisColunas %}
+                                                    <input class="form-check-input" type="checkbox" value="{{ loop.index-1 }}" id="{{ 'Coluna_' + c }}" disabled name="selected_coluna[]">
+                                                    {% elif c in SelecionadasColunas %}
+                                                    <input class="form-check-input" type="checkbox" value="{{ loop.index-1 }}" id="{{ 'Coluna_' + c }}" checked name="selected_coluna[]">
+                                                    {% else %}
+                                                    <input class="form-check-input" type="checkbox" value="{{ loop.index-1 }}" id="{{ 'Coluna_' + c }}" name="selected_coluna[]">
+                                                    {% endif %}
+                                                    <label class="form-check-label" for="{{ 'Coluna_' + c }}">
+                                                        {{ c }}
+                                                    </label>
+                                                </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                        <div class="input-group mb-3">
+                                            <label class="input-group-text" for="reference">Reference Column</label>
+                                            <select class="form-select" id="reference" name="reference" required>
+                                                <option value="">Choose...</option>
+                                                {% for c in TodasColunas %}
+                                                {% if c not in SelecionaveisColunas %}
+                                                <option disabled value="{{ loop.index-1 }}"> {{ c }}</option>
+                                                {% elif loop.index-1 == Reference %}
+                                                <option selected value="{{ loop.index-1 }}">{{ c }}</option>
+                                                {% else %}
+                                                <option value="{{ loop.index-1 }}"> {{ c }}</option>
+                                                {% endif %}
+                                                {% endfor %}
+                                            </select>
+                                            <div class="invalid-feedback">
+                                              Please select a valid reference.
+                                            </div>
+                                        </div>
+                                        <div class="input-group mb-3">
+                                            <button class="w-100 btn btn-primary btn-lg" type="submit">Continue to create</button>
+                                        </div>
+                                        <div class="container">
+                                            <!--<h2>Progress Bar With Label</h2>-->
+                                            <div class="progress">
+                                               <div class="progress-bar" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" style="width:0%"></div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>                  
+                            </div>
+
+                            <!-- Brand Buttons -->
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">What is an optimization?</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p>An optimization ...</p>
+                                    <p>Optimizations will be stored in the cloud ...</p>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-lg-8">
+                            <table 
+                                class="table-responsive small"
+                                class="table table-striped table-sm"
+                                id="tableDataView"
+                                data-toggle="table"
+                                data-search="true"
+                                data-show-columns="true"
+                                data-height="460"
+                                data-show-pagination-switch="true"
+                                data-pagination="true"
+                                data-buttons-align="right">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        {% for c in TodasColunas %}
+                                            <th scope="col">{{ c }}</th>
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for d in Dados %}
+                                    <tr>
+                                        <td>{{ loop.index }}</td>
+                                            {% for v in d %}
+                                            <td>{{ v }}</td>
+                                            {% endfor %}
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>                  
+                    </div>
+                </div>
+                <!-- /.container-fluid -->
+
+            </div>
+            <!-- End of Main Content -->
+
+            <!-- Footer -->
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>Copyright &copy; Your Website 2025</span>
+                    </div>
+                </div>
+            </footer>
+            <!-- End of Footer -->
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+    </header>
+
+    {% include 'rodape.html' %}
+</body>
+
+</html>
