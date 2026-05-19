@@ -109,18 +109,35 @@ Access the production application here:
    ```
 ---
 
-## ☁️ Deploy no Google Cloud
+## ☁️ Deploying to Google Cloud (Cloud Run)
 
-To build and deploy to the managed infrastructure:
+### 1. Deploying the Data Processor
+The calculation engine (`processardados.py`) should be deployed as a separate service: 
 
 ```bash
-# Via Cloud Build
-gcloud builds submit --tag gcr.io/robust-optimizer/index 
-gcloud run deploy --image gcr.io/robust-optimizer/index --platform managed
-
-# Or directly via source code
-gcloud run deploy --source .
+# Deploy the processor
+gcloud run deploy morsy-processor \
+  --source . \
+  --command "gunicorn" \
+  --args "-b :$PORT processardados:app --timeout 300" \
+  --set-env-vars CLOUD_STORAGE_BUCKET="your_bucket_name" 
 ```
+*Note: Copy the URL generated after this deployment.*
+
+### 2. Deploying the Main Application
+Deploy the main application, configuring the URL of the processor:
+
+### Via Cloud Build
+```bash
+# Deploy the main UI
+gcloud run deploy morsy-ci \
+  --source . \
+  --command "gunicorn" \
+  --args "-b :$PORT main:app" \
+  --set-env-vars FLASK_SECRET_KEY="your_secret",CLOUD_STORAGE_BUCKET="your_bucket",PROCESSAR_DADOS_FUNCTION_URL="URL_OF_PROCESSOR_SERVICE"
+
+```
+Note: Use the URL copied in the previous step for PROCESSAR_DADOS_FUNCTION_URL.
 
 ---
 
@@ -273,18 +290,38 @@ Acesse a aplicação em produção aqui:
 
 ---
 
-## ☁️ Deploy no Google Cloud
+## ☁️ Deploy no Google Cloud (Cloud Run)
 
-Para realizar o build e deploy na infraestrutura gerenciada:
+### 1. Deploy do Processador de Dados
+O motor de cálculo (`processardados.py`) deve ser implantado como um serviço separado:
 
 ```bash
-# Via Cloud Build
-gcloud builds submit --tag gcr.io/robust-optimizer/index 
-gcloud run deploy --image gcr.io/robust-optimizer/index --platform managed
-
-# Ou diretamente via código fonte
-gcloud run deploy --source .
+# Implante o processador
+gcloud run deploy morsy-processor \
+  --source . \
+  --command "gunicorn" \
+  --args "-b :$PORT processardados:app --timeout 300" \
+  --set-env-vars CLOUD_STORAGE_BUCKET="nome_do_seu_bucket"
 ```
+*Nota: Copie a URL gerada após este deploy.*
+
+### 2. Deploy da Interface Principal
+#Implante a aplicação principal, configurando a URL do processador:
+
+```bash
+#Implante a aplicação principal
+gcloud run deploy morsy-ci \
+  --source . \
+  --set-env-vars PROCESSAR_DADOS_FUNCTION_URL="URL_DO_SERVICO_PROCESSOR",FLASK_SECRET_KEY="sua_chave",CLOUD_STORAGE_BUCKET="seu_bucket"
+```
+*Nota: Use a URL copiada no passo anterior para PROCESSAR_DADOS_FUNCTION_URL.*
+
+---
+
+in the previous step for PROCESSAR_DADOS_FUNCTION_URL.
+
+
+
 
 ---
 
